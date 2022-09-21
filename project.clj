@@ -8,10 +8,10 @@
                  [org.clojure/clojurescript "1.11.60"]
                  [com.stuartsierra/component "1.1.0"]
                  [http-kit "2.6.0"]
-                 [compojure "1.7.0"]]
-  :profiles {:dev {:plugins [[lein-cljsbuild "1.1.8"]
-                             [lein-figwheel "0.5.20"]]
-                   :dependencies [[reloaded.repl "0.2.4"]]
+                 [compojure "1.7.0"]
+                 [quiescent "0.3.2"]]
+  :profiles {:dev {:dependencies [[reloaded.repl "0.2.4"]
+                                  [com.bhauman/figwheel-main "0.2.18"]]
                    :source-paths ["dev"]
                    :cljsbuild {:builds [{:source-paths ["src" "dev"]
                                          :figwheel true
@@ -19,4 +19,6 @@
                                                     :output-dir "target/classes/public/out"
                                                     :optimizations :none
                                                     :recompile-dependents true
-                                                    :source-map true}}]}}})
+                                                    :source-map true}}]}}}
+  :aliases {"kaocha" ["run" "-m" "kaocha.runner"]
+            "fig" ["trampoline" "run" "-m" "figwheel.main"]})
