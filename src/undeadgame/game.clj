@@ -21,13 +21,16 @@
                 (assoc :matched? true)
                 (dissoc :revealed?))
             tile)) tiles))
+(defn- get-match [game]
+  (let [revealed (revealed-tiles game)]
+    (when (and (= 2 (count revealed))
+               (= 1 (count (set (map :face revealed)))))
+      (:face (first revealed)))))
 
 (defn- check-for-match [game]
-  (let [revealed (revealed-tiles game)]
-    (if (and (= 2 (count revealed))
-             (= 1 (count (set (map :face revealed)))))
-      (update-in game [:tiles] match-revealed)
-      game)))
+  (if-let [match (get-match game)]
+    (update-in game [:tiles] match-revealed)
+    game))
 
 (defn create-game []
   {:tiles (shuffle (map ->tile faces))
