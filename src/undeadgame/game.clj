@@ -21,15 +21,40 @@
                 (assoc :matched? true)
                 (dissoc :revealed?))
             tile)) tiles))
+
 (defn- get-match [game]
   (let [revealed (revealed-tiles game)]
     (when (and (= 2 (count revealed))
                (= 1 (count (set (map :face revealed)))))
       (:face (first revealed)))))
 
+(defn- replace-remaining [sand replacement]
+  (concat
+   (take-while (complement #{:remaining}) sand)
+   replacement
+   (->> (drop-while (complement #{:remaining}) sand)
+        (drop (count replacement)))))
+
+(defn- wake-up-dead [tiles]
+  (mapv (fn [tile]
+          (if (= (:face tile) :gy)
+            (assoc tile :face :zo)
+            tile))
+        tiles))
+
+(defn- perform-match-actions [game match]
+  (case match
+    :fg (assoc-in game [:foggy?] true)
+    :zo (-> game
+            (update-in [:sand] #(replace-remaining % (repeat 3 :zo)))
+            (update-in [:tiles] wake-up-dead))
+    game))
+
 (defn- check-for-match [game]
   (if-let [match (get-match game)]
-    (update-in game [:tiles] match-revealed)
+    (-> game
+        (update-in [:tiles] match-revealed)
+        (perform-match-actions match))
     game))
 
 (defn create-game []
@@ -42,3 +67,18 @@
         (assoc-in [:tiles index :revealed?] true)
         (check-for-match))
     game))
+
+
+(def sanddy `(:zo :zo :zo :zo :zo :zo :zo :zo :zo :zo))
+(def zom  (repeat 2 :zo))
+(comment
+  (take-while (complement #{:rem}) sanddy)
+  (drop-while (complement #{:rem}) sanddy)
+
+  (concat
+   (take-while (complement #{:rem}) sanddy)
+   zom
+   (->> (drop-while (complement #{:rem}) sanddy)
+        (drop (count zom))))
+
+  (drop-while (complement #{:remaining}) (repeat 10 :rem)))

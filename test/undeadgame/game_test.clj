@@ -12,7 +12,7 @@
 (defn reveal-one [face game]
   (reveal-tile game (find-face-index game face)))
 
-;; create-game
+create-game
 (expect {:h1 2 :h2 2 :h3 2 :h4 1 :h5 2 :zo 3 :gy 1 :fg 2}
         (->> (create-game) :tiles (map :face) frequencies))
 
@@ -36,11 +36,39 @@
              (filter :revealed?)
              (set)))
 
-(expect #{{:face :h3 :revealed? true}}
+
+(expect #{{:face :h1 :matched? true} {:face :h3 :matched? true}}
         (->> (create-game)
              (reveal-one :h1)
              (reveal-one :h1)
              (reveal-one :h3)
+             (reveal-one :h3)
              :tiles
-             (filter :revealed?)
+             (filter :matched?)
              (set)))
+
+(expect true (->>
+              (create-game)
+              (reveal-one :fg)
+              (reveal-one :fg)
+              :foggy?))
+
+(expect [:zo :zo :zo :remaining]
+        (->>
+         (create-game)
+         (reveal-one :zo)
+         (reveal-one :zo)
+         :sand
+         (take 4)))
+
+(expect {:h1 2 :h2 2 :h3 2 :h4 1 :h5 2 :zo 4 :fg 2}
+        (->>
+         (create-game)
+         (reveal-one :zo)
+         (reveal-one :zo)
+         :tiles
+         (map :face)
+         frequencies))
+
+;; (expect {:h1 2, :h2 2, :h3 2, :h4 1, :h5 2, :zo 4, :fg 2, :gy 1}
+;;         {:h1 2, :h5 2, :fg 2, :h2 2, :zo 4, :h3 2, :h4 1, :gy 1})
